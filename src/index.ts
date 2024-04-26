@@ -1,12 +1,13 @@
 import { PrismaClient } from "@prisma/client";
-import express from "express";
+import express, { Request, Response } from "express";
+
 const prisma = new PrismaClient();
 
 const app = express();
 app.use(express.json());
 const port = 3000;
 
-app.post("/user", async (req, res) => {
+app.post("/user", async (req: Request, res: Response) => {
   try {
     const { name } = req.body;
 
@@ -19,7 +20,7 @@ app.post("/user", async (req, res) => {
     });
 
     res.json(newUser);
-  } catch (error) {
+  } catch (error: any) {
     console.log(error.message);
     res.status(500).json({
       message: "Internal Server Error",
@@ -27,7 +28,7 @@ app.post("/user", async (req, res) => {
   }
 });
 
-app.get("/users", async (req, res) => {
+app.get("/users", async (req: Request, res: Response) => {
   try {
     const users = await prisma.user.findMany();
 
