@@ -14,5 +14,4 @@ app.use(cookieParser());
 app.use("/api/user", userRoutes);
 app.use("/api/chores", choresRoutes);
 
-
 export default app;
