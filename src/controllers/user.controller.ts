@@ -1,12 +1,13 @@
 import prisma from "../prismaClient.js";
 import * as bcrypt from "bcrypt";
 import { Request, Response, NextFunction } from "express";
-import { isQueryNotFound } from "../helpers/user.helpers.js";
+import { getUserByEmail, isQueryNotFound } from "../helpers/user.helpers.js";
 import jwt from "jsonwebtoken";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
-const MAX_TOKEN_AGE = 24 * 60 * 60 * 24;
+const MAX_TOKEN_AGE = 24 * 60 * 60 * 1000;
 
-const registerUser = async (
+const registerParent = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -14,7 +15,7 @@ const registerUser = async (
   try {
     let { firstName, lastName, email, password } = req.body;
 
-    const existingUser = await prisma.user.findFirst({
+    const existingUser = await prisma.parentUser.findFirst({
       where: {
         email,
       },
@@ -29,10 +30,10 @@ const registerUser = async (
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const newUser = await prisma.user.create({
+    const newUser = await prisma.parentUser.create({
       data: {
-        first_name: firstName,
-        last_name: lastName,
+        firstName,
+        lastName,
         email,
         password: hashedPassword,
       },
@@ -54,53 +55,47 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
 
   try {
-    const user = await prisma.user.findFirstOrThrow({
-      where: {
-        email,
-      },
-    });
+    const user = await getUserByEmail(email);
 
-    const isCredentialValid = await bcrypt.compare(password, user.password);
+    if (user) {
+      const isCredentialValid = await bcrypt.compare(password, user.password);
 
-    if (!isCredentialValid) {
-      return res.status(400).json({
-        message: "Invalid credentials",
-      });
-    }
-
-    const { first_name, last_name } = user;
-
-    const token = jwt.sign(
-      {
-        firstName: first_name,
-        lastName: last_name,
-        email: email,
-      },
-      process.env.TOKEN_SECRET!,
-      {
-        expiresIn: MAX_TOKEN_AGE,
+      if (!isCredentialValid) {
+        return res.status(400).json({ message: "Invalid credentials" });
       }
-    );
 
-    res.cookie("jwt", token, {
-      httpOnly: true,
-      maxAge: MAX_TOKEN_AGE,
-    });
+      const { firstName, lastName, id } = user;
 
-    res.status(200).send({
-      message: "Login successful",
-    });
-  } catch (error: any) {
-    if (isQueryNotFound(error)) {
-      return res.status(404).json({
-        message: "User not found",
+      const token = jwt.sign(
+        {
+          firstName,
+          lastName,
+          email,
+          id,
+        },
+        process.env.TOKEN_SECRET!,
+        { expiresIn: MAX_TOKEN_AGE }
+      );
+
+      res.cookie("jwt", token, {
+        httpOnly: true,
+        maxAge: MAX_TOKEN_AGE,
+      });
+
+      return res.status(200).json({ message: "Login successful", user });
+    } else {
+      throw new PrismaClientKnownRequestError("User not found", {
+        code: "P2025",
+        clientVersion: "",
       });
     }
+  } catch (error) {
+    if (isQueryNotFound(error)) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    return res.status(500).json({
-      message: "Internal Server Error",
-    });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-export { registerUser, loginUser };
+export { registerParent, loginUser };

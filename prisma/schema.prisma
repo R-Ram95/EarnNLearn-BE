@@ -13,10 +13,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id         String @id @default(auto()) @map("_id") @db.ObjectId
-  first_name String
-  last_name  String
-  password   String
-  email      String
+model ParentUser {
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  firstName String
+  lastName  String
+  password  String
+  email     String
+  children  ChildUser[]
+  Chores    Chores[]
 }
+
+model ChildUser {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  firstName    String
+  lastName     String
+  password     String
+  email        String
+  parent       ParentUser @relation(fields: [parentUserId], references: [id])
+  parentUserId String     @db.ObjectId
+  Chores       Chores[]
+}
+
+// Chores
+enum CHORE_STATUS {
+  NOT_ACCEPTED
+  IN_PROGRESS
+  AWAITING_APPROVAL
+  COMPLETED
+}
+
+model Chores {
+  choreId      String       @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  amount       Int
+  createdAt    DateTime     @default(now())
+  dueDate      DateTime
+  status       CHORE_STATUS @default(NOT_ACCEPTED)
+  assignedTo   ChildUser    @relation(fields: [childUserId], references: [id])
+  assignedBy   ParentUser   @relation(fields: [parentUserId], references: [id])
+  childUserId  String       @db.ObjectId
+  parentUserId String       @db.ObjectId
+}
+
+// Transactions 

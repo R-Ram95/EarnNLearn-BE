@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import prisma from "../prismaClient.js";
 
 const isQueryNotFound = (error: any) => {
   return (
@@ -7,4 +8,12 @@ const isQueryNotFound = (error: any) => {
   );
 };
 
-export { isQueryNotFound };
+async function getUserByEmail(email: string) {
+  let user = await prisma.parentUser.findFirst({ where: { email } });
+  if (!user) {
+    user = await prisma.childUser.findFirst({ where: { email } });
+  }
+  return user;
+}
+
+export { isQueryNotFound, getUserByEmail };
