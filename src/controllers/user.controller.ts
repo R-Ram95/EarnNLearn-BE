@@ -1,8 +1,10 @@
-import { Prisma } from "@prisma/client";
 import prisma from "../prismaClient.js";
 import * as bcrypt from "bcrypt";
 import { Request, Response, NextFunction } from "express";
 import { isQueryNotFound } from "../helpers/user.helpers.js";
+import jwt from "jsonwebtoken";
+
+const MAX_TOKEN_AGE = 24 * 60 * 60 * 24;
 
 const registerUser = async (
   req: Request,
@@ -19,8 +21,8 @@ const registerUser = async (
     });
 
     if (existingUser) {
-      return res.status(409).json({
-        message: "Email is already in use",
+      return res.status(400).json({
+        message: "User Already registered, please login",
       });
     }
 
@@ -50,7 +52,6 @@ const registerUser = async (
 
 const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
-  console.log(req.body);
 
   try {
     const user = await prisma.user.findFirstOrThrow({
@@ -63,14 +64,32 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
 
     if (!isCredentialValid) {
       return res.status(400).json({
-        message: "Invalid Credentials",
+        message: "Invalid credentials",
       });
     }
 
-    // don't want to send hashed password to client
-    const { password: _, ...userData } = user;
+    const { first_name, last_name } = user;
 
-    res.send(userData);
+    const token = jwt.sign(
+      {
+        firstName: first_name,
+        lastName: last_name,
+        email: email,
+      },
+      process.env.TOKEN_SECRET!,
+      {
+        expiresIn: MAX_TOKEN_AGE,
+      }
+    );
+
+    res.cookie("jwt", token, {
+      httpOnly: true,
+      maxAge: MAX_TOKEN_AGE,
+    });
+
+    res.status(200).send({
+      message: "Login successful",
+    });
   } catch (error: any) {
     if (isQueryNotFound(error)) {
       return res.status(404).json({
