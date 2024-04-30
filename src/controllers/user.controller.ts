@@ -1,6 +1,8 @@
+import { Prisma } from "@prisma/client";
 import prisma from "../prismaClient.js";
 import * as bcrypt from "bcrypt";
 import { Request, Response, NextFunction } from "express";
+import { isQueryNotFound } from "../helpers/user.helpers.js";
 
 const registerUser = async (
   req: Request,
@@ -9,6 +11,18 @@ const registerUser = async (
 ) => {
   try {
     let { firstName, lastName, email, password } = req.body;
+
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        email,
+      },
+    });
+
+    if (existingUser) {
+      return res.status(409).json({
+        message: "Email is already in use",
+      });
+    }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -23,9 +37,9 @@ const registerUser = async (
     });
 
     // don't want to send hashed password to client
-    const { password: removedPassword, ...data } = newUser;
+    const { password: _, ...userData } = newUser;
 
-    res.json(data);
+    res.json(userData);
   } catch (error: any) {
     console.log(error.message);
     return res.status(500).json({
@@ -34,38 +48,40 @@ const registerUser = async (
   }
 };
 
-// const loginUser = async (req: Request, res: Response, next: NextFunction) => {
-//   const { userEmail, password } = req.body;
+const loginUser = async (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+  console.log(req.body);
 
-//   try {
-//     const user = await prisma.user.findUnique({
-//       where: {
-//         email: userEmail as string,
-//       },
-//     });
+  try {
+    const user = await prisma.user.findFirstOrThrow({
+      where: {
+        email,
+      },
+    });
 
-//     if (!user) {
-//       return res.status(404).send({
-//         message: "User not found",
-//       });
-//     }
+    const isCredentialValid = await bcrypt.compare(password, user.password);
 
-//     // check the password hashes
-//     const isCredentialValid = await bcrypt.compare(password, user.password);
+    if (!isCredentialValid) {
+      return res.status(400).json({
+        message: "Invalid Credentials",
+      });
+    }
 
-//     if (!isCredentialValid) {
-//       return res.status(400).json({
-//         message: "Invalid Credentials.",
-//       });
-//     }
+    // don't want to send hashed password to client
+    const { password: _, ...userData } = user;
 
-//     res.send(user);
-//   } catch (error: any) {
-//     console.log(error.message);
-//     return res.status(500).json({
-//       message: "Internal Server Error",
-//     });
-//   }
-// };
+    res.send(userData);
+  } catch (error: any) {
+    if (isQueryNotFound(error)) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
 
-export { registerUser };
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export { registerUser, loginUser };
