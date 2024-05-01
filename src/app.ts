@@ -7,23 +7,12 @@ import cors from "cors";
 const app = express();
 
 app.use(express.json());
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
-const corsOptions = {
-    origin: 'http://localhost:3000', // or wherever your frontend is hosted
-    credentials: true, // This is important to allow sending cookies across origins
-  };
-  
-  app.use(cors(corsOptions));
-
-
+app.use(cookieParser());
 // /api/user/logout
 app.use("/api/user", userRoutes);
 app.use("/api/chores", choresRoutes);
-app.use(cookieParser());
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
-
-// /api/user/logout
-app.use("/api/user", userRoutes);
 
 export default app;
