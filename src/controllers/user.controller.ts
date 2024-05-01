@@ -14,7 +14,7 @@ const registerParent = async (
 ) => {
   try {
     let { firstName, lastName, email, password } = req.body;
-
+  
     const existingUser = await prisma.parentUser.findFirst({
       where: {
         email,
@@ -78,7 +78,7 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
       );
 
       res.cookie("jwt", token, {
-        httpOnly: true,
+        httpOnly: false,
         maxAge: MAX_TOKEN_AGE,
       });
 
