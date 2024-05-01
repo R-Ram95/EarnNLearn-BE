@@ -12,7 +12,9 @@ const router = Router();
 
 // THIS IS A SAMPLE ROUTE, WE DON'T NEED IT
 router.route("/").get(verifyJwt, getUser);
-router.route("/login").post(validateData(userRegistrationSchema), loginUser);
-router.route("/register-parent").post(validateData, registerParent);
+router.route("/login").post(loginUser);
+router
+  .route("/register-parent")
+  .post(validateData(userRegistrationSchema), registerParent);
 
 export default router;
