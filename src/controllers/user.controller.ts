@@ -14,7 +14,6 @@ const registerParent = async (
 ) => {
   try {
     let { firstName, lastName, email, password } = req.body;
-  
     const existingUser = await prisma.parentUser.findFirst({
       where: {
         email,
@@ -78,7 +77,7 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
       );
 
       res.cookie("jwt", token, {
-        httpOnly: false,
+        httpOnly: true,
         maxAge: MAX_TOKEN_AGE,
       });
 
@@ -98,4 +97,28 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { registerParent, loginUser };
+// EXAMPLE FOR GETTING USER DATA - TODO DELETE THIS
+const getUser = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = res.locals.user;
+  // don't want to send the claim in the jwt -> not sure if we need this??
+  res.locals.user = "";
+
+  try {
+    const user = await prisma.childUser.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!user) {
+      return res.status(400).send("User not found");
+    }
+
+    const { password, ...userData } = user;
+
+    return res.status(200).json(userData);
+  } catch (error) {
+    return res.status(500).send("Internal server error");
+  }
+};
+
+export { registerParent, loginUser, getUser };
