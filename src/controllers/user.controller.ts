@@ -101,7 +101,6 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
 // EXAMPLE FOR GETTING USER DATA - TODO DELETE THIS
 const getUser = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = res.locals.user;
-  console.log("id", id);
   // don't want to send the claim in the jwt -> not sure if we need this??
   res.locals.user = "";
 
@@ -111,7 +110,6 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
         id,
       },
     });
-    console.log("user", user);
     if (!user) {
       return res.status(400).send("User not found");
     }
