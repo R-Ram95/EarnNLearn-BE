@@ -11,9 +11,11 @@ export const validateData = (schema: z.ZodObject<any, any>) => {
     } catch (error) {
       // request body is incorrect
       if (error instanceof ZodError) {
-        const errorMessages = error.errors.map((issue: any) => ({
-          message: `${issue.path.join} is ${issue.message}`,
-        }));
+        const errorMessages = error.errors.map((issue: any) => {
+          return {
+            message: `Field ${issue.path} is ${issue.message}`,
+          };
+        });
 
         res.status(STATUS_CODES.BAD_REQUEST).send({
           error: "Invalid data",
