@@ -7,14 +7,14 @@ const getChores = async (req: Request, res: Response) => {
     const chores = await prisma.chores.findMany({
       include: {
         assignedTo: true,
-        assignedBy: true
-      }
+        assignedBy: true,
+      },
     });
     res.json(chores);
   } catch (error) {
     return res
-    .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-    .send("Internal server error");
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .send("Internal server error");
   }
 };
 
@@ -28,15 +28,15 @@ const createChore = async (req: Request, res: Response) => {
         dueDate,
         status: "NOT_ACCEPTED", // default status
         childUserId,
-        parentUserId
-      }
+        parentUserId,
+      },
     });
     res.status(201).json(newChore);
   } catch (error) {
     return res
-    .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-    .send("Internal server error");
-    }
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .send("Internal server error");
+  }
 };
 
 const updateChoreStatus = async (req: Request, res: Response) => {
@@ -45,14 +45,14 @@ const updateChoreStatus = async (req: Request, res: Response) => {
   try {
     const updatedChore = await prisma.chores.update({
       where: { choreId: id },
-      data: { status }
+      data: { status },
     });
     res.json(updatedChore);
   } catch (error) {
     return res
-    .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-    .send("Internal server error");
-    }
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .send("Internal server error");
+  }
 };
 
 export { getChores, createChore, updateChoreStatus };
