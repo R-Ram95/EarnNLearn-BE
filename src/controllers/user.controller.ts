@@ -98,4 +98,30 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { registerParent, loginUser };
+// EXAMPLE FOR GETTING USER DATA - TODO DELETE THIS
+const getUser = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = res.locals.user;
+  console.log("id", id);
+  // don't want to send the claim in the jwt -> not sure if we need this??
+  res.locals.user = "";
+
+  try {
+    const user = await prisma.childUser.findUnique({
+      where: {
+        id,
+      },
+    });
+    console.log("user", user);
+    if (!user) {
+      return res.status(400).send("User not found");
+    }
+
+    const { password, ...userData } = user;
+
+    return res.status(200).json(userData);
+  } catch (error) {
+    return res.status(500).send("Internal server error");
+  }
+};
+
+export { registerParent, loginUser, getUser };
