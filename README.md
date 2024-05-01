@@ -21,3 +21,8 @@
 `npm run prisma-generate` - runs `prisma generate`
 
 `npm run prisma-studio` - runs `prisma studio`
+
+TEST DATA
+User: Klaus
+email:email@email.com
+Password: IAmASpy
