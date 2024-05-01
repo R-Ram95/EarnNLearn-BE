@@ -127,4 +127,32 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { registerParent, loginUser, getUser };
+const getChildren = async (req: Request, res: Response, next: NextFunction) => {
+  const parentId = res.locals.user.id; // Assuming `id` is part of JWT claims
+
+  try {
+    const children = await prisma.childUser.findMany({
+      where: {
+        parentUserId: parentId,
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+      }
+    });
+
+    if (!children || children.length === 0) {
+      return res.status(404).json({ message: "No children found for this parent." });
+    }
+
+    return res.status(200).json(children);
+  } catch (error) {
+    console.error("Failed to retrieve children:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+export { registerParent, loginUser, getUser, getChildren };

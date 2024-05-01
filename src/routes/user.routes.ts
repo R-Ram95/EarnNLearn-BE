@@ -3,6 +3,7 @@ import {
   registerParent,
   loginUser,
   getUser,
+  getChildren
 } from "../controllers/user.controller.js";
 import { verifyJwt } from "../middleware/auth.middleware.js";
 import { validateData } from "../middleware/validation.middleware.js";
@@ -19,5 +20,6 @@ router.route("/login").post(validateData(userLoginSchema), loginUser);
 router
   .route("/register-parent")
   .post(validateData(userRegistrationSchema), registerParent);
+router.route("/children").get(verifyJwt, getChildren);
 
 export default router;
