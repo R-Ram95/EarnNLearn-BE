@@ -47,7 +47,7 @@ const registerParent = async (req: Request, res: Response, _: NextFunction) => {
   }
 };
 
-const loginUser = async (req: Request, res: Response, _: NextFunction) => {
+const login = async (req: Request, res: Response, _: NextFunction) => {
   const { email, password } = req.body;
 
   try {
@@ -102,6 +102,14 @@ const loginUser = async (req: Request, res: Response, _: NextFunction) => {
   }
 };
 
+const logout = async (req: Request, res: Response, _: NextFunction) => {
+  res.cookie("jwt", "", { maxAge: 0 });
+
+  res.status(STATUS_CODES.OK).send({
+    message: "User logged out",
+  });
+};
+
 // EXAMPLE FOR GETTING USER DATA - TODO DELETE THIS
 const getUser = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = res.locals.user;
@@ -114,6 +122,7 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
         id,
       },
     });
+
     if (!user) {
       return res.status(STATUS_CODES.NOT_FOUND).send("User not found");
     }
@@ -128,4 +137,4 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { registerParent, loginUser, getUser };
+export { registerParent, login, logout, getUser };
