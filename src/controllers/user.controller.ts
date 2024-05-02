@@ -85,7 +85,6 @@ const registerChild = async (req: Request, res: Response, _: NextFunction) => {
 
     res.status(STATUS_CODES.CREATED).json(childData);
   } catch (error) {
-    console.log(error.message);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       message: "Internal Server Error",
     });
@@ -198,13 +197,17 @@ const getChildren = async (req: Request, res: Response, next: NextFunction) => {
     });
 
     if (!children || children.length === 0) {
-      return res.status(404).json({ message: "No children found for this parent." });
+      return res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .send("Internal server error");
     }
 
     return res.status(200).json(children);
   } catch (error) {
     console.error("Failed to retrieve children:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res
+    .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+    .send("Internal server error");
   }
 };
 

@@ -1,5 +1,6 @@
 import prisma from "../prismaClient.js";
 import { Request, Response } from "express";
+import { STATUS_CODES } from "../constants/enums.js";
 
 const getChores = async (req: Request, res: Response) => {
   try {
@@ -11,7 +12,9 @@ const getChores = async (req: Request, res: Response) => {
     });
     res.json(chores);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch chores", error: error.message });
+    return res
+    .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+    .send("Internal server error");
   }
 };
 
@@ -30,8 +33,10 @@ const createChore = async (req: Request, res: Response) => {
     });
     res.status(201).json(newChore);
   } catch (error) {
-    res.status(500).json({ message: "Failed to create chore", error: error.message });
-  }
+    return res
+    .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+    .send("Internal server error");
+    }
 };
 
 const updateChoreStatus = async (req: Request, res: Response) => {
@@ -44,8 +49,10 @@ const updateChoreStatus = async (req: Request, res: Response) => {
     });
     res.json(updatedChore);
   } catch (error) {
-    res.status(500).json({ message: "Failed to update chore status", error: error.message });
-  }
+    return res
+    .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+    .send("Internal server error");
+    }
 };
 
 export { getChores, createChore, updateChoreStatus };
