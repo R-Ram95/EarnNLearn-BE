@@ -196,7 +196,7 @@ const getChildren = async (req: Request, res: Response, next: NextFunction) => {
       }
     });
 
-    if (!children || children.length === 0) {
+    if (!children) {
       return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
       .send("Internal server error");
