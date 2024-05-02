@@ -1,9 +1,11 @@
 import { Router } from "express";
 import {
   registerParent,
+  registerChild,
   login,
   logout,
   getUser,
+  getChildren
 } from "../controllers/user.controller.js";
 import { verifyJwt } from "../middleware/auth.middleware.js";
 import { validateData } from "../middleware/validation.middleware.js";
@@ -21,5 +23,9 @@ router.route("/logout").post(logout);
 router
   .route("/register-parent")
   .post(validateData(userRegistrationSchema), registerParent);
+router
+  .route("/register-child")
+  .post(verifyJwt, validateData(userRegistrationSchema), registerChild);
+router.route("/children").get(verifyJwt, getChildren);
 
 export default router;

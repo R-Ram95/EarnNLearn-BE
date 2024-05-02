@@ -9,7 +9,6 @@ export const verifyJwt = async (
 ) => {
   try {
     const cookie = req.cookies["jwt"];
-
     const claims = jwt.verify(cookie, process.env.TOKEN_SECRET!);
 
     if (!claims) {
