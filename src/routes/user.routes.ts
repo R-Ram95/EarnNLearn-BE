@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   registerParent,
+  registerChild,
   loginUser,
   getUser,
   getChildren
@@ -20,6 +21,9 @@ router.route("/login").post(validateData(userLoginSchema), loginUser);
 router
   .route("/register-parent")
   .post(validateData(userRegistrationSchema), registerParent);
+router
+  .route("/register-child")
+  .post(verifyJwt, validateData(userRegistrationSchema), registerChild);
 router.route("/children").get(verifyJwt, getChildren);
 
 export default router;

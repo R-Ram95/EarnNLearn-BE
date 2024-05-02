@@ -46,6 +46,52 @@ const registerParent = async (req: Request, res: Response, _: NextFunction) => {
   }
 };
 
+
+const registerChild = async (req: Request, res: Response, _: NextFunction) => {
+  const parentId = res.locals.user.id;  // Assuming this is correctly set from your JWT validation middleware
+
+  try {
+    let { firstName, lastName, email, password } = req.body;
+
+    // Check if the child user already exists
+    const existingChild = await prisma.childUser.findFirst({
+      where: {
+        email,
+      },
+    });
+
+    if (existingChild) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        message: "Child user already registered, please login",
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create the new child user and link them to their parent user
+    const newChildUser = await prisma.childUser.create({
+      data: {
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        parentUserId: parentId  // Link the child user to their parent user
+      },
+    });
+
+    // Exclude the hashed password when sending the user data back to the client
+    const { password: _, ...childData } = newChildUser;
+
+    res.status(STATUS_CODES.CREATED).json(childData);
+  } catch (error) {
+    console.log(error.message);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      message: "Internal Server Error",
+    });
+  }
+};
+
 const loginUser = async (req: Request, res: Response, _: NextFunction) => {
   const { email, password } = req.body;
 
@@ -128,7 +174,7 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const getChildren = async (req: Request, res: Response, next: NextFunction) => {
-  const parentId = res.locals.user.id; // Assuming `id` is part of JWT claims
+  const parentId = res.locals.user.id; 
 
   try {
     const children = await prisma.childUser.findMany({
@@ -155,4 +201,4 @@ const getChildren = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 
-export { registerParent, loginUser, getUser, getChildren };
+export { registerParent, registerChild, loginUser, getUser, getChildren };
