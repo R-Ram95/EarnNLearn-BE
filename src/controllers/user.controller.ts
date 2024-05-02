@@ -92,7 +92,7 @@ const registerChild = async (req: Request, res: Response, _: NextFunction) => {
   }
 };
 
-const loginUser = async (req: Request, res: Response, _: NextFunction) => {
+const login = async (req: Request, res: Response, _: NextFunction) => {
   const { email, password } = req.body;
 
   try {
@@ -145,6 +145,14 @@ const loginUser = async (req: Request, res: Response, _: NextFunction) => {
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
+};
+
+const logout = async (req: Request, res: Response, _: NextFunction) => {
+  res.cookie("jwt", "", { maxAge: 0 });
+
+  res.status(STATUS_CODES.OK).send({
+    message: "User logged out",
+  });
 };
 
 // EXAMPLE FOR GETTING USER DATA - TODO DELETE THIS
@@ -201,4 +209,4 @@ const getChildren = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 
-export { registerParent, registerChild, loginUser, getUser, getChildren };
+export { registerParent, registerChild, login, logout, getUser, getChildren };
