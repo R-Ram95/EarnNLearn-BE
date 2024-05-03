@@ -46,10 +46,8 @@ const registerParent = async (req: Request, res: Response, _: NextFunction) => {
   }
 };
 
-
 const registerChild = async (req: Request, res: Response, _: NextFunction) => {
-  const parentId = res.locals.user.id;  // Assuming this is correctly set from your JWT validation middleware
-
+  const parentId = res.locals.user.id;
   try {
     let { firstName, lastName, email, password } = req.body;
 
@@ -76,7 +74,7 @@ const registerChild = async (req: Request, res: Response, _: NextFunction) => {
         lastName,
         email,
         password: hashedPassword,
-        parentUserId: parentId  // Link the child user to their parent user
+        parentUserId: parentId, // Link the child user to their parent user
       },
     });
 
@@ -181,7 +179,7 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const getChildren = async (req: Request, res: Response, next: NextFunction) => {
-  const parentId = res.locals.user.id; 
+  const parentId = res.locals.user.id;
 
   try {
     const children = await prisma.childUser.findMany({
@@ -193,23 +191,22 @@ const getChildren = async (req: Request, res: Response, next: NextFunction) => {
         firstName: true,
         lastName: true,
         email: true,
-      }
+      },
     });
 
     if (!children) {
       return res
-      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .send("Internal server error");
+        .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+        .send("Internal server error");
     }
 
     return res.status(200).json(children);
   } catch (error) {
     console.error("Failed to retrieve children:", error);
     return res
-    .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-    .send("Internal server error");
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .send("Internal server error");
   }
 };
-
 
 export { registerParent, registerChild, login, logout, getUser, getChildren };

@@ -1,6 +1,8 @@
 import prisma from "../prismaClient.js";
+import { CHORE_STATUS, Prisma } from "@prisma/client";
 import { Request, Response } from "express";
 import { STATUS_CODES } from "../constants/enums.js";
+import { isQueryNotFound } from "../helpers/user.helpers.js";
 
 const getChores = async (req: Request, res: Response) => {
   const { childId } = req.params;
@@ -34,12 +36,12 @@ const createChore = async (req: Request, res: Response) => {
         title,
         amount,
         dueDate,
-        status: "NOT_ACCEPTED", // default status
+        status: CHORE_STATUS.NOT_ACCEPTED, // default status
         childUserId,
         parentUserId: parentId,
       },
     });
-    res.status(201).json(newChore);
+    res.json(newChore);
   } catch (error) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
@@ -50,6 +52,7 @@ const createChore = async (req: Request, res: Response) => {
 const updateChoreStatus = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { status } = req.body;
+
   try {
     const updatedChore = await prisma.chores.update({
       where: { choreId: id },
@@ -57,6 +60,11 @@ const updateChoreStatus = async (req: Request, res: Response) => {
     });
     res.json(updatedChore);
   } catch (error) {
+    if (isQueryNotFound(error)) {
+      return res.status(STATUS_CODES.NOT_FOUND).send("chore does not exist");
+    }
+
+    console.error("Failed to update chore:", error);
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
       .send("Internal server error");
