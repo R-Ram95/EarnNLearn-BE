@@ -5,7 +5,7 @@ import {
   login,
   logout,
   getUser,
-  getChildren
+  getChildren,
 } from "../controllers/user.controller.js";
 import { verifyJwt } from "../middleware/auth.middleware.js";
 import { validateData } from "../middleware/validation.middleware.js";

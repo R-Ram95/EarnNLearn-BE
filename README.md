@@ -23,6 +23,7 @@
 `npm run prisma-studio` - runs `prisma studio`
 
 TEST DATA
+PARENT USER WITH CHILDREN:
 User: Klaus
 email:email@email.com
 Password: IAmASpy
