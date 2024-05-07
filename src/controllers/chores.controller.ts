@@ -38,7 +38,7 @@ const createChore = async (req: Request, res: Response) => {
         dueDate,
         status: CHORE_STATUS.NOT_ACCEPTED, // default status
         childUserId,
-        parentId,
+        parentUserId: parentId,
       },
     });
     res.json(newChore);
@@ -61,7 +61,7 @@ const updateChoreStatus = async (req: Request, res: Response) => {
     res.json(updatedChore);
   } catch (error) {
     if (isQueryNotFound(error)) {
-      return res.status(STATUS_CODES.NOT_FOUND).send("chore does not exist");
+      return res.status(STATUS_CODES.NOT_FOUND).send("Chore not found");
     }
 
     console.error("Failed to update chore:", error);
@@ -71,4 +71,28 @@ const updateChoreStatus = async (req: Request, res: Response) => {
   }
 };
 
-export { getChores, createChore, updateChoreStatus };
+const deleteChore = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  console.log(id);
+  try {
+    const deletedChore = await prisma.chores.delete({
+      where: { choreId: id },
+    });
+    res.json({ message: "Chore successfully deleted", deletedChore });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2025"
+    ) {
+      // If no chore is found with the ID, Prisma returns error code P2025
+      return res.status(STATUS_CODES.NOT_FOUND).send("Chore not found");
+    }
+
+    console.error("Failed to delete chore:", error);
+    return res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .send("Internal server error");
+  }
+};
+
+export { getChores, createChore, updateChoreStatus, deleteChore };

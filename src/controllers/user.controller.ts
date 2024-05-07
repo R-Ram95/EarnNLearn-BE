@@ -47,8 +47,7 @@ const registerParent = async (req: Request, res: Response, _: NextFunction) => {
 };
 
 const registerChild = async (req: Request, res: Response, _: NextFunction) => {
-  const parentId = res.locals.user.id; // Assuming this is correctly set from your JWT validation middleware
-
+  const parentId = res.locals.user.id;
   try {
     let { firstName, lastName, email, password } = req.body;
 
