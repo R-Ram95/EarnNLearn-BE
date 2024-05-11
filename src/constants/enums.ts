@@ -6,3 +6,8 @@ export enum STATUS_CODES {
   NOT_FOUND = 404,
   INTERNAL_SERVER_ERROR = 500,
 }
+
+export enum ROLE {
+  PARENT = "Parent",
+  CHILD = "Child",
+}

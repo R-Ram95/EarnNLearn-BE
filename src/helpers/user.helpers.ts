@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../prismaClient.js";
+import { ROLE } from "../constants/enums.js";
 
 const isQueryNotFound = (error: any) => {
   return (
@@ -10,10 +11,12 @@ const isQueryNotFound = (error: any) => {
 
 async function getUserByEmail(email: string) {
   let user = await prisma.parentUser.findFirst({ where: { email } });
+  let role = ROLE.PARENT;
   if (!user) {
     user = await prisma.childUser.findFirst({ where: { email } });
+    role = ROLE.CHILD;
   }
-  return user;
+  return { ...user, role: role };
 }
 
 export { isQueryNotFound, getUserByEmail };

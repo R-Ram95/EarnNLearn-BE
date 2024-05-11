@@ -96,7 +96,7 @@ const login = async (req: Request, res: Response, _: NextFunction) => {
     const user = await getUserByEmail(email);
 
     if (user) {
-      const isCredentialValid = await bcrypt.compare(password, user.password);
+      const isCredentialValid = await bcrypt.compare(password, user.password!);
 
       if (!isCredentialValid) {
         return res
@@ -104,7 +104,7 @@ const login = async (req: Request, res: Response, _: NextFunction) => {
           .json({ message: "Invalid credentials" });
       }
 
-      const { firstName, lastName, id } = user;
+      const { firstName, lastName, id, role } = user;
 
       const token = jwt.sign(
         {
@@ -112,6 +112,7 @@ const login = async (req: Request, res: Response, _: NextFunction) => {
           lastName,
           email,
           id,
+          role,
         },
         process.env.TOKEN_SECRET!,
         { expiresIn: MAX_TOKEN_AGE }
@@ -122,9 +123,11 @@ const login = async (req: Request, res: Response, _: NextFunction) => {
         maxAge: MAX_TOKEN_AGE,
       });
 
+      const { password: _, ...returnedUser } = user;
+
       return res
         .status(STATUS_CODES.OK)
-        .json({ message: "Login successful", user });
+        .json({ message: "Login successful", returnedUser });
     } else {
       throw new PrismaClientKnownRequestError("User not found", {
         code: "P2025",
