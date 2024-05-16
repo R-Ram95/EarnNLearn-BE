@@ -17,7 +17,18 @@ const getChores = async (req: Request, res: Response) => {
         assignedBy: true,
       },
     });
-    res.json(chores);
+
+    // calculate completed chores vs. non-completed
+    const totalChores = chores.length;
+    const completedChores = chores.filter(
+      (chore) => chore.status === CHORE_STATUS.COMPLETED
+    ).length;
+
+    res.json({
+      chores: chores,
+      completedChores: completedChores,
+      totalChores: totalChores,
+    });
   } catch (error) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
