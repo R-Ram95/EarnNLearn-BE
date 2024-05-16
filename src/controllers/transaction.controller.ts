@@ -19,11 +19,13 @@ const getTransactions = async (
     });
 
     const totalEarnings = transactions
-      .filter((transaction) => transaction.status === TRANSACTION_STATUS.REWARD)
-      .reduce((accumulator, currrent) => accumulator + currrent.amount, 0);
+      .filter(
+        (transaction) => transaction.status === TRANSACTION_STATUS.DEPOSIT
+      )
+      .reduce((accumulator, current) => accumulator + current.amount, 0);
 
     const totalSaved = transactions.reduce(
-      (accumulator, currrent) => accumulator + currrent.amount,
+      (accumulator, current) => accumulator + current.amount,
       0
     );
 

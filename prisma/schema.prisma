@@ -57,7 +57,7 @@ model Chores {
 }
 
 enum TRANSACTION_STATUS {
-  REWARD
+  DEPOSIT
   WITHDRAWAL
 }
 

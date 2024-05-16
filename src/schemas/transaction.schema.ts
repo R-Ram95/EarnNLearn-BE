@@ -1,6 +1,10 @@
 import { z } from "zod";
+import { TRANSACTION_STATUS } from "@prisma/client";
 
-const transactionStatusSchema = z.enum(["REWARD", "WITHDRAWAL"]);
+const transactionStatusSchema = z.enum([
+  TRANSACTION_STATUS.DEPOSIT,
+  TRANSACTION_STATUS.WITHDRAWAL,
+]);
 
 const transactionSchema = z.object({
   amount: z.number(),
