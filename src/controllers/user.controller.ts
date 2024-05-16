@@ -178,32 +178,6 @@ const getChild = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-// EXAMPLE FOR GETTING USER DATA - TODO DELETE THIS
-const getUser = async (req: Request, res: Response, next: NextFunction) => {
-  const { id } = res.locals.user;
-  // don't want to send the claim in the jwt -> not sure if we need this??
-  res.locals.user = "";
-
-  try {
-    const user = await prisma.childUser.findUnique({
-      where: {
-        id,
-      },
-    });
-    if (!user) {
-      return res.status(STATUS_CODES.NOT_FOUND).send("User not found");
-    }
-
-    const { password, ...userData } = user;
-
-    return res.status(STATUS_CODES.OK).json(userData);
-  } catch (error) {
-    return res
-      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .send("Internal server error");
-  }
-};
-
 const getChildren = async (req: Request, res: Response, next: NextFunction) => {
   const parentId = res.locals.user.id;
 
@@ -235,12 +209,4 @@ const getChildren = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export {
-  registerParent,
-  registerChild,
-  login,
-  logout,
-  getUser,
-  getChildren,
-  getChild,
-};
+export { registerParent, registerChild, login, logout, getChildren, getChild };
