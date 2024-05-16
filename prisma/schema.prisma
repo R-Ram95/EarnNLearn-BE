@@ -24,14 +24,15 @@ model ParentUser {
 }
 
 model ChildUser {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
   firstName    String
   lastName     String
   password     String
   email        String
-  parent       ParentUser @relation(fields: [parentUserId], references: [id])
-  parentUserId String     @db.ObjectId
+  parent       ParentUser     @relation(fields: [parentUserId], references: [id])
+  parentUserId String         @db.ObjectId
   Chores       Chores[]
+  Transaction  Transactions[]
 }
 
 // Chores
@@ -55,4 +56,16 @@ model Chores {
   parentUserId String       @db.ObjectId
 }
 
-// Transactions 
+enum TRANSACTION_STATUS {
+  DEPOSIT
+  WITHDRAWAL
+}
+
+model Transactions {
+  transactionID String             @id @default(auto()) @map("_id") @db.ObjectId
+  amount        Int
+  child         ChildUser          @relation(fields: [childUserId], references: [id])
+  status        TRANSACTION_STATUS
+  description   String
+  childUserId   String             @db.ObjectId
+}

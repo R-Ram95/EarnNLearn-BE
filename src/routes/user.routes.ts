@@ -4,7 +4,6 @@ import {
   registerChild,
   login,
   logout,
-  getUser,
   getChild,
   getChildren,
 } from "../controllers/user.controller.js";
@@ -17,8 +16,6 @@ import {
 
 const router = Router();
 
-// THIS IS A SAMPLE ROUTE, WE DON'T NEED IT
-router.route("/").get(verifyJwt, getUser);
 router.route("/login").post(validateData(userLoginSchema), login);
 router.route("/logout").post(logout);
 router.route("/child/:id").get(verifyJwt, getChild);
