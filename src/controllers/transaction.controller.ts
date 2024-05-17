@@ -43,7 +43,7 @@ const getTransactions = async (
     if (isQueryNotFound(error)) {
       return res
         .status(STATUS_CODES.NOT_FOUND)
-        .send(`Transaction for child ${id} not found.`);
+        .send(`Transaction for child ${childId} not found.`);
     }
 
     return res
