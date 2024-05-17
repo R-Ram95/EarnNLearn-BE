@@ -60,7 +60,10 @@ const createTransaction = async (
   const { childId, amount, status, description } = req.body;
 
   let transactionAmount = amount;
-  if (status === TRANSACTION_STATUS.WITHDRAWAL) {
+  if (
+    status === TRANSACTION_STATUS.WITHDRAWAL ||
+    status === TRANSACTION_STATUS.PENDING
+  ) {
     transactionAmount = -amount;
   }
 
