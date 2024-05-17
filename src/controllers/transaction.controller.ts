@@ -9,12 +9,12 @@ const getTransactions = async (
   res: Response,
   _: NextFunction
 ) => {
-  const { id } = req.params;
+  const { childId } = req.params;
 
   try {
     const transactions = await prisma.transactions.findMany({
       where: {
-        childUserId: id,
+        childUserId: childId,
       },
     });
 
