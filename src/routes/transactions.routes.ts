@@ -1,17 +1,26 @@
 import { Router } from "express";
 import { verifyJwt } from "../middleware/auth.middleware.js";
 import { validateData } from "../middleware/validation.middleware.js";
-import { transactionSchema } from "../schemas/transaction.schema.js";
+import {
+  createTransactionSchema,
+  updateTransactionSchema,
+} from "../schemas/transaction.schema.js";
 import {
   getTransactions,
   createTransaction,
+  updateTransaction,
 } from "../controllers/transaction.controller.js";
 
 const router = Router();
 
 router.route("/transaction/:childId").get(verifyJwt, getTransactions);
+
 router
   .route("/transaction")
-  .post(verifyJwt, validateData(transactionSchema), createTransaction);
+  .post(verifyJwt, validateData(createTransactionSchema), createTransaction);
+
+router
+  .route("/transaction")
+  .put(verifyJwt, validateData(updateTransactionSchema), updateTransaction);
 
 export default router;
