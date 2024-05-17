@@ -84,7 +84,7 @@ const updateChoreStatus = async (req: Request, res: Response) => {
 
 const deleteChore = async (req: Request, res: Response) => {
   const { id } = req.params;
-  console.log(id);
+
   try {
     const deletedChore = await prisma.chores.delete({
       where: { choreId: id },
