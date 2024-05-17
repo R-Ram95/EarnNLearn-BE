@@ -37,7 +37,7 @@ const getTransactions = async (
     res.json({
       transactionList: transactions,
       totalSaved: totalSaved,
-      totalEearnings: totalEarnings,
+      totalEarnings: totalEarnings,
     });
   } catch (error) {
     if (isQueryNotFound(error)) {
@@ -59,12 +59,17 @@ const createTransaction = async (
 ) => {
   const { childId, amount, status, description } = req.body;
 
+  let transactionAmount = amount;
+  if (status === TRANSACTION_STATUS.WITHDRAWAL) {
+    transactionAmount = -amount;
+  }
+
   // TODO for improvements - check if child exists, if not return 404
 
   try {
     const newTransaction = await prisma.transactions.create({
       data: {
-        amount: amount,
+        amount: transactionAmount,
         description: description,
         childUserId: childId,
         status: status,
