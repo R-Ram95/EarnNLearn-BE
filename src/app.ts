@@ -7,10 +7,7 @@ import transactionRoutes from "./routes/transactions.routes.js";
 
 const app = express();
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://earnnlearn.onrender.com",
-];
+const allowedOrigins = ["*"];
 
 app.use(
   cors({
