@@ -7,12 +7,16 @@ import transactionRoutes from "./routes/transactions.routes.js";
 
 const app = express();
 
-const allowedOrigins = ["*"];
+const allowedOrigins = [
+  "https://earnnlearn.onrender.com",
+  "http://localhost:3000",
+];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (allowedOrigins.includes(origin!) || !origin) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
@@ -22,6 +26,7 @@ app.use(
   })
 );
 
+app.options("*", cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use("/api/user", userRoutes);
