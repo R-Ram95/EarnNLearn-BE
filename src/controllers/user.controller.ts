@@ -122,13 +122,16 @@ const login = async (req: Request, res: Response, _: NextFunction) => {
         httpOnly: false,
         maxAge: MAX_TOKEN_AGE,
         domain: process.env.DOMAIN,
+        sameSite: "none",
+        secure: true,
+        path: "/*",
       });
 
       const { password: _, ...returnedUser } = user;
 
       return res
         .status(STATUS_CODES.OK)
-        .json({ message: "Login successful", returnedUser });
+        .json({ message: "Login successful", returnedUser, token });
     } else {
       throw new PrismaClientKnownRequestError("User not found", {
         code: "P2025",
