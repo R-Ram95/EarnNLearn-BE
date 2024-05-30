@@ -119,12 +119,12 @@ const login = async (req: Request, res: Response, _: NextFunction) => {
       );
 
       res.cookie("jwt", token, {
-        httpOnly: false,
+        httpOnly: true,
         maxAge: MAX_TOKEN_AGE,
         domain: process.env.DOMAIN,
         sameSite: "none",
         secure: true,
-        path: "/*",
+        path: "/",
       });
 
       const { password: _, ...returnedUser } = user;
