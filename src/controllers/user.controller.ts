@@ -121,6 +121,7 @@ const login = async (req: Request, res: Response, _: NextFunction) => {
       res.cookie("jwt", token, {
         httpOnly: false,
         maxAge: MAX_TOKEN_AGE,
+        domain: process.env.DOMAIN,
       });
 
       const { password: _, ...returnedUser } = user;
