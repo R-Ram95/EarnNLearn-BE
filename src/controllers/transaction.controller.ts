@@ -89,19 +89,15 @@ const updateTransaction = async (
   res: Response,
   _: NextFunction
 ) => {
-  const { transactionId, childId, amount, status, description } = req.body;
+  const { transactionId } = req.params;
+  const { status } = req.body;
 
   try {
     const updatedTransaction = await prisma.transactions.update({
       where: {
         id: transactionId,
       },
-      data: {
-        amount: amount,
-        childUserId: childId,
-        status: status,
-        description: description,
-      },
+      data: { status },
     });
 
     res.json(updatedTransaction);

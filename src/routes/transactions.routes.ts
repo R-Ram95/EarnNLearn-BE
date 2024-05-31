@@ -19,8 +19,6 @@ router
   .route("/transaction")
   .post(verifyJwt, validateData(createTransactionSchema), createTransaction);
 
-router
-  .route("/transaction")
-  .put(verifyJwt, validateData(updateTransactionSchema), updateTransaction);
+router.route("/update/:transactionId").put(verifyJwt, updateTransaction);
 
 export default router;
